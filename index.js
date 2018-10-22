@@ -143,6 +143,8 @@ Osmosis.prototype.config = function (option, value) {
             opts[key] = option[key];
         }
     }
+
+    return this;
 };
 
 /**
