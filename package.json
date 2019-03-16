@@ -20,7 +20,7 @@
     "email": "chipka01@email.franklin.edu"
   },
   "dependencies": {
-    "libxmljs-dom": "~0.0.14",
+    "libxmljs-dom": "~0.0.17",
     "needle": "^2.2.4"
   },
   "devDependencies": {
