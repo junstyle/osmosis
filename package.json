@@ -1,6 +1,6 @@
 {
   "name": "osmosis",
-  "version": "1.1.16",
+  "version": "1.1.17",
   "description": "Web scraper for NodeJS",
   "keywords": [
     "web",
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "libxmljs-dom": "~0.0.17",
-    "needle": "^2.2.4",
+    "needle": "^2.3.1",
     "p-timeout": "^3.1.0"
   },
   "devDependencies": {
