@@ -21,7 +21,8 @@
   },
   "dependencies": {
     "libxmljs-dom": "~0.0.17",
-    "needle": "^1.6.0"
+    "needle": "^1.6.0",
+    "p-timeout": "^3.1.0"
   },
   "devDependencies": {
     "jscs": ">=3.0.2",
