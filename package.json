@@ -25,6 +25,7 @@
     "p-timeout": "^3.2.0"
   },
   "devDependencies": {
+    "@types/puppeteer": "^5.4.0",
     "nodeunit": "0.11.3"
   },
   "scripts": {
@@ -32,6 +33,7 @@
   },
   "license": "MIT",
   "main": "index",
+  "types": "index.d.ts",
   "engines": {
     "node": ">= 0.8.0"
   },
