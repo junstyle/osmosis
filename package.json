@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "libxmljs-dom": "junstyle/libxmljs-dom",
-    "needle": "^1.6.0",
+    "needle": "^2.5.2",
     "p-timeout": "^3.2.0"
   },
   "devDependencies": {
