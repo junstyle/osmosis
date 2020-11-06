@@ -17,6 +17,8 @@ interface PuppeteerDriverOptions extends LaunchOptions {
     keepPage?: boolean;
 }
 
+type ConfigItem = 'accept' | 'compressed' | 'concurrency' | 'decode_response' | 'follow' | 'follow_set_cookies' | 'follow_set_referer' | 'keep_data' | 'parse_cookies' | 'parse_response' | 'rejectUnauthorized' | 'statsThreshold' | 'timeout' | 'tries' | 'user_agent';
+
 interface Osmosis {
     /**
      * define domain where osmosis is parsing data from
@@ -73,7 +75,7 @@ interface Osmosis {
     /**
      * Set configuration options for the **preceeding** command on down the chain.
      */
-    config(option: string | { [key: string]: any }, value?: any): Osmosis;
+    config(option: ConfigItem | { [key in ConfigItem]: any }, value?: any): Osmosis;
 
     /**
      * Set a cookie. Short for `.config({ cookies: ... })`. Note: Setting a cookie to `null` will delete the cookie.
@@ -95,7 +97,7 @@ interface Osmosis {
      */
     done(callback: () => any): Osmosis;
 
-    driver(driver: string | object, options: { [key: string]: any } | PuppeteerDriverOptions): Osmosis;
+    driver(driver: 'puppeteer' | string | object, options: { [key: string]: any } | PuppeteerDriverOptions): Osmosis;
 
     then(cb: (context: object, data: object, next: Function) => void): Osmosis;
 
