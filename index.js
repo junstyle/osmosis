@@ -1,19 +1,19 @@
 'use strict';
 
 var Command = require('./lib/Command.js'),
-    Queue   = require('./lib/Queue.js'),
+    Queue = require('./lib/Queue.js'),
     request = require('./lib/Request.js'),
-    libxml  = require('libxmljs-dom'),
-    instanceId      = 0,
-    memoryUsage     = 0,
+    libxml = require('libxmljs-dom'),
+    instanceId = 0,
+    memoryUsage = 0,
     cachedSelectors = {},
-    toMB    = function (size, num) {
+    toMB = function (size, num) {
         return (size / 1024 / 1024).toFixed(num || 2) + 'Mb';
     },
 
-    extend  = function (object, donor) {
+    extend = function (object, donor) {
         var key, keys = Object.keys(donor),
-                    i = keys.length;
+            i = keys.length;
 
         while (i--) {
             key = keys[i];
@@ -58,9 +58,9 @@ function Osmosis(url, params) {
         return Osmosis.get(url, params);
     }
 
-    this.queue   = new Queue(this);
+    this.queue = new Queue(this);
     this.command = new Command(this);
-    this.id      = ++instanceId;
+    this.id = ++instanceId;
 }
 
 
@@ -87,23 +87,23 @@ function Osmosis(url, params) {
  */
 
 Osmosis.prototype.opts = {
-    accept:                 'text/html,application/xhtml+xml,' +
-                            'application/xml;q=0.9,*/*;q=0.8',
-    compressed:             true,
-    concurrency:            5,
-    decode_response:        true,
-    follow:                 3,
-    follow_set_cookies:     true,
-    follow_set_referer:     true,
-    keep_data:              false,
-    parse_cookies:          true, // Parse "Set-Cookie" header
-    parse_response:         false,
-    rejectUnauthorized:     false,
-    statsThreshold:         25,
-    timeout:                30 * 1000,
-    tries:                  3,
-    user_agent:             'Mozilla/5.0 (Windows NT x.y; rv:10.0) ' +
-                            'Gecko/20100101 Firefox/10.0'
+    accept: 'text/html,application/xhtml+xml,' +
+        'application/xml;q=0.9,*/*;q=0.8',
+    compressed: true,
+    concurrency: 5,
+    decode_response: true,
+    follow: 3,
+    follow_set_cookies: true,
+    follow_set_referer: true,
+    keep_data: false,
+    parse_cookies: true, // Parse "Set-Cookie" header
+    parse_response: false,
+    rejectUnauthorized: false,
+    statsThreshold: 25,
+    timeout: 30 * 1000,
+    tries: 3,
+    user_agent: 'Mozilla/5.0 (Windows NT x.y; rv:10.0) ' +
+        'Gecko/20100101 Firefox/10.0',
 };
 
 /**
@@ -120,32 +120,32 @@ Osmosis.prototype.opts = {
  */
 
 Osmosis.config =
-Osmosis.prototype.config = function (option, value) {
-    var hasPrototype = (this.prototype !== undefined),
-        opts, key;
+    Osmosis.prototype.config = function (option, value) {
+        var hasPrototype = (this.prototype !== undefined),
+            opts, key;
 
-    if (hasPrototype === true) {
-        opts = this.prototype.opts;
-    } else if (this.opts === undefined) {
-        opts = this.opts = {};
-    } else {
-        opts = this.opts;
-    }
-
-    if (option === undefined) {
-        return opts;
-    }
-
-    if (value !== undefined) {
-        opts[option] = value;
-    } else if (option !== undefined) {
-        for (key in option) {
-            opts[key] = option[key];
+        if (hasPrototype === true) {
+            opts = this.prototype.opts;
+        } else if (this.opts === undefined) {
+            opts = this.opts = {};
+        } else {
+            opts = this.opts;
         }
-    }
 
-    return this;
-};
+        if (option === undefined) {
+            return opts;
+        }
+
+        if (value !== undefined) {
+            opts[option] = value;
+        } else if (option !== undefined) {
+            for (key in option) {
+                opts[key] = option[key];
+            }
+        }
+
+        return this;
+    };
 
 /**
  * Run (or re-run) an Osmosis instance.
@@ -161,7 +161,7 @@ Osmosis.prototype.run = function () {
     var self = this;
 
     process.nextTick(function () {
-        self.started  = true;
+        self.started = true;
         self.command.start();
     });
 };
@@ -174,63 +174,63 @@ Osmosis.prototype.run = function () {
 
 Osmosis.prototype.request = function (url, opts, callback, tries) {
     var self = this,
-        href   = url.href,
+        href = url.href,
         method = url.method,
         params = url.params;
 
     this.requests++;
     this.queue.requests++;
     this.queue.push();
-    
+
     if (typeof opts.user_agent === 'function') {
         opts.user_agent = opts.user_agent();
     }
 
     request(url.method,
-            url,
-            url.params,
-            opts,
-            tries,
-            function (err, res, data) {
-                var proxies = opts.proxies;
+        url,
+        url.params,
+        opts,
+        tries,
+        function (err, res, data) {
+            var proxies = opts.proxies;
 
-                self.queue.requests--;
+            self.queue.requests--;
 
-                if ((res === undefined || res.statusCode !== 404) &&
-                    proxies !== undefined) {
-                    self.command.error('proxy ' + (proxies.index + 1) +
-                                        '/' + proxies.length +
-                                        ' failed (' + opts.proxy + ')');
+            if ((res === undefined || res.statusCode !== 404) &&
+                proxies !== undefined) {
+                self.command.error('proxy ' + (proxies.index + 1) +
+                    '/' + proxies.length +
+                    ' failed (' + opts.proxy + ')');
 
-                    // remove the failing proxy
-                    if (proxies.length > 1) {
-                        opts.proxies.splice(proxies.index, 1);
-                        opts.proxy = proxies[proxies.index];
-                    }
+                // remove the failing proxy
+                if (proxies.length > 1) {
+                    opts.proxies.splice(proxies.index, 1);
+                    opts.proxy = proxies[proxies.index];
                 }
+            }
 
-                if (err !== null && ++tries < opts.tries) {
-                    self.queueRequest(url, opts, callback, tries);
+            if (err !== null && ++tries < opts.tries) {
+                self.queueRequest(url, opts, callback, tries);
 
-                    if (self.opts.log === true) {
-                        self.command.error(err + ', retrying ' +
-                                        url.href + ' (' +
-                                        (tries + 1) + '/' +
-                                        opts.tries + ')');
-                    }
-                } else {
-                    callback(err, res, data);
-                }
-
-                self.dequeueRequest();
-                self.queue.pop();
-            })
-            .on('redirect', function (new_url) {
                 if (self.opts.log === true) {
-                    self.command.log('[redirect] ' +
-                                     href + ' -> ' + new_url);
+                    self.command.error(err + ', retrying ' +
+                        url.href + ' (' +
+                        (tries + 1) + '/' +
+                        opts.tries + ')');
                 }
-            });
+            } else {
+                callback(err, res, data);
+            }
+
+            self.dequeueRequest();
+            self.queue.pop();
+        })
+        .on('redirect', function (new_url) {
+            if (self.opts.log === true) {
+                self.command.log('[redirect] ' +
+                    href + ' -> ' + new_url);
+            }
+        });
 };
 
 /**
@@ -245,9 +245,9 @@ Osmosis.prototype.request = function (url, opts, callback, tries) {
  */
 
 Osmosis.prototype.queueRequest = function (url,
-                                           opts,
-                                           callback,
-                                           tries) {
+    opts,
+    callback,
+    tries) {
     if (tries === undefined) {
         tries = 0;
     }
@@ -302,10 +302,10 @@ Osmosis.prototype.parse = function (data, opts) {
  */
 
 Osmosis.prototype.resources = function () {
-    var mem         = process.memoryUsage(),
-        memDiff     = toMB(mem.rss - memoryUsage),
-        libxml_mem  = libxml.memoryUsage(),
-        nodes       = libxml.nodeCount();
+    var mem = process.memoryUsage(),
+        memDiff = toMB(mem.rss - memoryUsage),
+        libxml_mem = libxml.memoryUsage(),
+        nodes = libxml.nodeCount();
 
     if (this.opts.debug !== true) {
         this.resources = null;
@@ -322,20 +322,20 @@ Osmosis.prototype.resources = function () {
     }
 
     this.command.debug(
-                'stack: '    + this.queue.count + ', ' +
+        'stack: ' + this.queue.count + ', ' +
 
-                'requests: ' + this.requests +
-                             ' (' + this.queue.requests + ' queued), ' +
+        'requests: ' + this.requests +
+        ' (' + this.queue.requests + ' queued), ' +
 
-                'RAM: '      + toMB(mem.rss) + ' (' + memDiff + '), ' +
+        'RAM: ' + toMB(mem.rss) + ' (' + memDiff + '), ' +
 
-                'libxml: '   + ((libxml_mem / mem.rss) * 100).toFixed(1) +
-                             '% (' + nodes + ' nodes), ' +
+        'libxml: ' + ((libxml_mem / mem.rss) * 100).toFixed(1) +
+        '% (' + nodes + ' nodes), ' +
 
-                'heap: '     + ((mem.heapUsed / mem.heapTotal) * 100)
-                             .toFixed(0) + '% of ' +
-                             toMB(mem.heapTotal)
-            );
+        'heap: ' + ((mem.heapUsed / mem.heapTotal) * 100)
+            .toFixed(0) + '% of ' +
+        toMB(mem.heapTotal)
+    );
 
     memoryUsage = mem.rss;
 };
@@ -351,8 +351,8 @@ Osmosis.prototype.resources = function () {
 
 Osmosis.prototype.setParent = function (parent) {
     this.parent = parent;
-    this.queue  = parent.instance.queue;
-    this.opts   = parent.instance.opts;
+    this.queue = parent.instance.queue;
+    this.opts = parent.instance.opts;
 };
 
 /**
@@ -399,7 +399,7 @@ Object.keys(Command.prototype).forEach(function (name) {
 
     Osmosis[name] = function StartingFunction(arg1, arg2, arg3) {
         var instance = new Osmosis(),
-            command  = instance.command;
+            command = instance.command;
 
         instance.calledWithNew = (this instanceof StartingFunction);
 
@@ -410,7 +410,7 @@ Object.keys(Command.prototype).forEach(function (name) {
 // libxmljs overrides:
 
 libxml.Document.prototype.findXPath = libxml.Document.prototype.find;
-libxml.Element.prototype.findXPath  = libxml.Element.prototype.find;
+libxml.Element.prototype.findXPath = libxml.Element.prototype.find;
 
 libxml.Document.prototype.find = function (selector, cache) {
     return this.root().find(selector, cache);
